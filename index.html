@@ -1,1 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 행복한 우리 반 앱 진열장 ✨</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Jua Font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background-image: url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        /* Custom Hover Floating Effect */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(251, 146, 60, 0.25);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fef3c7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fcd34d;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-700 flex flex-col justify-between pb-10 relative">
+
+    <!-- 연한 흰색 반투명 오버레이 막 (배경 위 글씨 가독성을 높여줍니다) -->
+    <div class="fixed inset-0 bg-white/60 pointer-events-none -z-10 backdrop-blur-[2px]"></div>
+
+    <!-- Header Section -->
+    <header class="pt-8 pb-6 px-4 text-center relative overflow-hidden">
+        <!-- Floating Deco Elements -->
+        <div class="absolute top-2 left-5 text-3xl animate-bounce">🎈</div>
+        <div class="absolute top-4 right-8 text-3xl animate-pulse">⭐</div>
+        <div class="absolute bottom-2 left-1/4 text-2xl">🌱</div>
+        <div class="absolute bottom-3 right-1/4 text-2xl">🧸</div>
+
+        <div class="max-w-4xl mx-auto">
+            <span class="inline-block bg-amber-100/90 text-amber-700 text-sm px-4 py-1.5 rounded-full mb-3 shadow-sm border border-amber-200">
+                🏫 우리 교실 디지털 동반자
+            </span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-900 drop-shadow-sm tracking-wide mb-2">
+                ✨ 3학년 1반 앱 진열장 ✨
+            </h1>
+            <p class="text-amber-800 text-base sm:text-lg font-medium">오늘 필요한 수업 앱을 터치하여 바로 출발해 봐요!</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow relative z-10">
+        
+        <!-- Controls: Category Filter & Search -->
+        <div class="bg-white/85 backdrop-blur-md rounded-3xl p-4 sm:p-6 mb-8 shadow-sm border-2 border-amber-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+            
+            <!-- Category Buttons -->
+            <div id="category-filters" class="flex flex-wrap gap-2 justify-center w-full md:w-auto">
+                <!-- Dynamically generated category buttons -->
+            </div>
+
+            <!-- Search Box -->
+            <div class="relative w-full md:w-64">
+                <input type="text" id="search-input" placeholder="앱 이름 검색..." 
+                       class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-amber-50/70 border-2 border-amber-200 focus:outline-none focus:border-amber-400 focus:bg-white text-gray-700 placeholder-amber-400 transition-all text-sm sm:text-base">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
+            </div>
+        </div>
+
+        <!-- App Grid Showcase -->
+        <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamic App Cards Will Appear Here -->
+        </div>
+
+        <!-- Empty State Message -->
+        <div id="empty-state" class="hidden text-center py-16 bg-white/70 backdrop-blur-sm rounded-3xl mt-4">
+            <div class="text-5xl mb-3">🔍</div>
+            <p class="text-amber-800 text-lg">찾으시는 앱이 없어요!</p>
+            <p class="text-amber-600 text-sm">검색어나 카테고리를 다시 확인해 보세요.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-amber-700 text-xs sm:text-sm px-4 relative z-10">
+        <div class="bg-white/70 backdrop-blur-sm inline-block px-6 py-2 rounded-full border border-amber-100/80 shadow-sm">
+            ☀️ 늘 함께 성장하는 즐거운 우리 교실 | Made with ❤️ for Students
+        </div>
+    </footer>
+
+    <!-- App Data & Rendering Logic -->
+    <script>
+        /**
+         * =================================================================
+         * 📌 [선생님 전용] 앱 목록 데이터 (여기서 한 줄만 추가/수정하시면 됩니다!)
+         * =================================================================
+         * - name: 앱 이름
+         * - description: 앱 설명
+         * - url: 클릭 시 이동할 웹주소
+         * - emoji: 카드 상단에 들어갈 귀여운 이모지
+         * - category: 카테고리 (예: 과학, 수업, 도구 등)
+         * - bg: 카드 배경 파스텔 색상 클래스
+         * - border: 카드 테두리 색상 클래스
+         */
+        const APP_DATA = [
+            { 
+                name: "동물 분류 탐정", 
+                description: "특징에 따라 동물을 찾아보는 탐정 수업!", 
+                url: "https://gemini.google.com/share/ef8ddfaf4dd1", 
+                emoji: "🦁", 
+                category: "과학", 
+                bg: "bg-emerald-50/95", 
+                border: "border-emerald-200" 
+            },
+            { 
+                name: "태양계 행성 탐험 도감", 
+                description: "우주 속 태양계 행성들을 살펴보아요!", 
+                url: "planets.html", 
+                emoji: "🪐", 
+                category: "과학", 
+                bg: "bg-sky-50/95", 
+                border: "border-sky-200" 
+            },
+            { 
+                name: "수업 이해도 신호등", 
+                description: "오늘 수업 내용을 얼마나 이해했는지 신호등으로 표현해요!", 
+                url: "https://goodteacher.my.canva.site/cn6yfa7tj1g84afr", 
+                emoji: "🚦", 
+                category: "수업", 
+                bg: "bg-purple-50/95", 
+                border: "border-purple-200" 
+            }
+        ];
+
+        // Global States
+        let currentCategory = "전체";
+        let searchQuery = "";
+
+        // DOM Elements
+        const appGrid = document.getElementById('app-grid');
+        const categoryFilters = document.getElementById('category-filters');
+        const searchInput = document.getElementById('search-input');
+        const emptyState = document.getElementById('empty-state');
+
+        // Extract Categories Dynamic
+        function getCategories() {
+            const categories = ["전체", ...new Set(APP_DATA.map(app => app.category))];
+            return categories;
+        }
+
+        // Render Category Filter Buttons
+        function renderCategoryButtons() {
+            const categories = getCategories();
+            categoryFilters.innerHTML = categories.map(cat => `
+                <button 
+                    onclick="filterByCategory('${cat}')"
+                    class="px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 border-2 ${
+                        currentCategory === cat 
+                        ? 'bg-amber-400 text-amber-950 border-amber-400 shadow-sm scale-105' 
+                        : 'bg-white/90 text-gray-600 border-amber-100 hover:bg-amber-100/70'
+                    }"
+                >
+                    ${cat === "전체" ? '🌈 전체보기' : cat}
+                </button>
+            `).join('');
+        }
+
+        // Render App Cards
+        function renderApps() {
+            const filteredApps = APP_DATA.filter(app => {
+                const matchesCategory = currentCategory === "전체" || app.category === currentCategory;
+                const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      app.description.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredApps.length === 0) {
+                appGrid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            appGrid.innerHTML = filteredApps.map(app => `
+                <a 
+                    href="${app.url}" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="card-hover block p-5 rounded-3xl border-2 ${app.border || 'border-amber-200'} ${app.bg || 'bg-white/95'} backdrop-blur-sm shadow-sm relative overflow-hidden group cursor-pointer"
+                >
+                    <!-- Top Ribbon Badge -->
+                    <span class="absolute top-3 right-3 text-xs px-2.5 py-1 rounded-full bg-white/90 border border-gray-100 text-gray-600 font-medium shadow-xs">
+                        ${app.category}
+                    </span>
+
+                    <!-- Emoji Box -->
+                    <div class="text-4xl sm:text-5xl my-2 text-center group-hover:scale-110 transition-transform duration-300">
+                        ${app.emoji}
+                    </div>
+
+                    <!-- Info -->
+                    <div class="text-center mt-3">
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-1 group-hover:text-amber-800 transition-colors">
+                            ${app.name}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-snug">
+                            ${app.description}
+                        </p>
+                    </div>
+
+                    <!-- Hover Arrow Indicator -->
+                    <div class="mt-4 flex items-center justify-center text-xs font-bold text-amber-700 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <span>바로가기</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // Category Filter Event Handler
+        function filterByCategory(category) {
+            currentCategory = category;
+            renderCategoryButtons();
+            renderApps();
+        }
+
+        // Search Input Event Handler
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderApps();
+        });
+
+        // Initial Load
+        window.onload = function() {
+            renderCategoryButtons();
+            renderApps();
+        };
+    </script>
+</body>
+</html>
